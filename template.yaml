@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  S3SAM112
+
+  Sample SAM Template for S3SAM111
+  
+
+Globals:
+  Function:
+    Timeout: 120
+
+Resources:
+  S3Image:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: src/
+      Handler: app.lambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      Events:
+        HelloWorld:
+          Type: Api 
+          Properties:
+            Path: /upload
+            Method: post
+        CreateBucket:
+           Type: S3
+           Properties:
+              Bucket: !Ref S3BucketCreation
+              Events: s3:ObjectCreated:*
+      Policies:
+       - S3CrudPolicy:
+           BucketName: '*'
+  S3BucketCreation:
+     Type: AWS::S3::Bucket
+     Properties:
+        BucketName: samimage
+
+Outputs:
+ 
+  S3Image:
+    Description: "API Gateway endpoint URL for dev stage for S3 image upload function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+  
